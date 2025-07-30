@@ -1,6 +1,23 @@
-class FlashCard {
+class Flashcard {
+  final String id;
   final String question;
   final String answer;
 
-  FlashCard({required this.question, required this.answer});
+  Flashcard({required this.id, required this.question, required this.answer});
+
+  factory Flashcard.fromJson(Map<String, dynamic> json) {
+    return Flashcard(
+      id: json['id'],
+      question: json['question'],
+      answer: json['answer'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'question': question,
+      'answer': answer,
+    };
+  }
 }

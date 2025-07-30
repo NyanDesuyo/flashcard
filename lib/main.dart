@@ -1,23 +1,46 @@
+// lib/main.dart (excerpt)
 import 'package:flutter/material.dart';
-import 'screens/auth/login_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart'; // <--- NEW IMPORT
+import 'screens/flashcard_list_screen.dart';
+import 'providers/auth_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authStatus = ref.watch(authProvider);
+
+    Widget initialScreen;
+    if (authStatus == AuthStatus.authenticated) {
+      initialScreen = const FlashcardListScreen();
+    } else if (authStatus == AuthStatus.unauthenticated) {
+      initialScreen = LoginScreen();
+    } else {
+      initialScreen = const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return MaterialApp(
-      title: 'Flash Card',
+      title: 'Flashcard App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      // The app will always start with the Login Screen
-      home: const LoginScreen(),
+      home: initialScreen,
+      routes: {
+        '/login': (context) => LoginScreen(),
+        '/register': (context) => RegisterScreen(), // <--- ADD THIS ROUTE
+        '/home': (context) => const FlashcardListScreen(),
+      },
     );
   }
 }
